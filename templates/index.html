@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YamlForge</title>
+    <link rel="icon" href="assets/logo.png" type="image/png" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .github-corner:hover .octo-arm {
+            animation: octocat-wave 560ms ease-in-out
+        }
+
+        @keyframes octocat-wave {
+
+            0%,
+            100% {
+                transform: rotate(0)
+            }
+
+            20%,
+            60% {
+                transform: rotate(-25deg)
+            }
+
+            40%,
+            80% {
+                transform: rotate(10deg)
+            }
+        }
+
+        @media (max-width:500px) {
+            .github-corner:hover .octo-arm {
+                animation: none
+            }
+
+            .github-corner .octo-arm {
+                animation: octocat-wave 560ms ease-in-out
+            }
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2196F3;
+            margin-bottom: 30px;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            color: #757575;
+            font-size: 16px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s, color 0.3s;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid #2196F3;
+            color: #2196F3;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #2196F3;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+
+        .dns-server-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .dns-server-input input {
+            flex-grow: 1;
+            margin-right: 10px;
+            margin-bottom: 0;
+        }
+
+        .remove-dns-server {
+            background-color: #f44336;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .remove-dns-server:hover {
+            background-color: #d32f2f;
+        }
+
+        #add-dns-server {
+            background-color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        #add-dns-server:hover {
+            background-color: #388E3C;
+        }
+
+        .footer {
+            background-color: #f8f8f8;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 14px;
+            color: #757575;
+            border-top: 1px solid #ddd;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .footer a {
+            color: #2196F3;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer a:hover {
+            color: #1976D2;
+            text-decoration: underline;
+        }
+
+        .footer p:last-child a::before {
+            content: "⚖ ";
+            margin-right: 2px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <a href="https://github.com/s0w0h/yamlforge" class="github-corner" aria-label="View source on GitHub"
+        target="_blank" title="View Code on GitHub">
+        <svg width="80" height="80" viewBox="0 0 250 250"
+            style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
+            <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+            <path
+                d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+                fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+            <path
+                d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+                fill="currentColor" class="octo-body"></path>
+        </svg>
+    </a>
+    <div class="container">
+        <h1>YamlForge</h1>
+
+        <div class="tab-container">
+            <button class="tab active" data-tab="serverlist">生成列表</button>
+            <button class="tab" data-tab="yamlprocess">YAML 处理</button>
+        </div>
+
+        <div id="serverlist" class="tab-content active">
+            <form id="YamlListForm">
+                <label for="source">YAML 源地址:</label>
+                <input type="text" id="source" name="source"
+                    placeholder="例如：https://raw.githubusercontent.com/xxx/xxx/main/xxx.yaml" required>
+
+                <label for="field">提取内容:</label>
+                <input type="text" id="field" name="field" placeholder="general.name" value="general.name">
+
+                <label for="resolve-domains">解析域名:</label>
+                <select id="resolve-domains" name="resolve_domains">
+                    <option value="false">否</option>
+                    <option value="true">是</option>
+                </select>
+
+                <label for="max-depth">最大递归深度:</label>
+                <input type="number" id="max-depth" name="max_depth" value="8" min="1" max="20">
+
+                <label for="dns-options">提取网址自定义DNS:</label>
+                <select id="dns-options" name="dns-options">
+                    <option value="no">否</option>
+                    <option value="yes">是</option>
+                </select>
+                <div id="dns-details" style="display: none;">
+                    <label for="dns_servers">DNS 服务器 (留空默认223.5.5.5和8.8.8.8):</label>
+                    <div id="dns-servers-container">
+                        <div class="dns-server-input">
+                            <input type="text" name="dns_servers" placeholder="例如：223.5.5.5" value="223.5.5.5,8.8.8.8">
+                            <button type="button" class="remove-dns-server">-</button>
+                        </div>
+                    </div>
+                    <button type="button" id="add-dns-server">+ 添加 DNS 服务器</button>
+                </div>
+
+                <label for="github-options">上传到 GitHub:</label>
+                <select id="github-options" name="github-options">
+                    <option value="no">否</option>
+                    <option value="yes">是</option>
+                </select>
+
+                <div id="github-details" style="display: none;">
+                    <label for="repo">GitHub 仓库名称:</label>
+                    <input type="text" id="repo" name="repo" placeholder="例如：username/repo">
+
+                    <label for="token">GitHub 个人访问令牌:</label>
+                    <input type="password" id="token" name="token">
+
+                    <label for="branch">GitHub 分支 (默认: main):</label>
+                    <input type="text" id="branch" name="branch" value="main">
+
+                    <label for="path">GitHub 路径 (默认: 根目录):</label>
+                    <input type="text" id="path" name="path">
+                </div>
+
+                <label for="filename">文件名 (默认: yaml.list):</label>
+                <input type="text" id="filename" name="filename" value="yaml.list">
+
+                <button type="submit">生成列表</button>
+            </form>
+        </div>
+
+        <div id="yamlprocess" class="tab-content">
+            <form id="yamlProcessForm">
+                <label for="yaml-source">YAML 源地址:</label>
+                <input type="text" id="yaml-source" name="source"
+                    placeholder="例如：https://raw.githubusercontent.com/xxx/xxx/main/xxx.yaml" required>
+
+                <label for="merge-url">合并 JS 文件 URL:</label>
+                <input type="text" id="merge-url" name="merge"
+                    placeholder="例如：https://raw.githubusercontent.com/xxx/xxx/main/merge.js" required>
+
+                <label for="yaml-filename">输出文件名:</label>
+                <input type="text" id="yaml-filename" name="filename" placeholder="例如：processed.yaml">
+
+                <button type="submit">处理 YAML</button>
+            </form>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 YamlForge. All rights reserved.</p>
+            <p>Created by <a href="https://github.com/s0w0h" target="_blank">s0w0h</a></p>
+            <p>Licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank">GNU General
+                    Public License v3.0</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching logic
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Server List Form Logic
+        const YamlListForm = document.getElementById('YamlListForm');
+        const resultDiv = document.getElementById('result');
+        const dnsOptionsSelect = document.getElementById('dns-options');
+        const dnsDetailsDiv = document.getElementById('dns-details');
+        const dnsServersContainer = document.getElementById('dns-servers-container');
+        const addDnsServerButton = document.getElementById('add-dns-server');
+        const githubOptionsSelect = document.getElementById('github-options');
+        const githubDetailsDiv = document.getElementById('github-details');
+
+        addDnsServerButton.addEventListener('click', () => {
+            const newInput = document.createElement('div');
+            newInput.classList.add('dns-server-input');
+            newInput.innerHTML = `
+                <input type="text" name="dns_servers" placeholder="例如：8.8.8.8">
+                <button type="button" class="remove-dns-server">-</button>
+            `;
+            dnsServersContainer.appendChild(newInput);
+
+            newInput.querySelector('.remove-dns-server').addEventListener('click', () => {
+                newInput.remove();
+            });
+        });
+
+        dnsServersContainer.querySelector('.remove-dns-server').addEventListener('click', (event) => {
+            if (dnsServersContainer.querySelectorAll('.dns-server-input').length > 1) {
+                event.target.closest('.dns-server-input').remove();
+            }
+        });
+
+        dnsOptionsSelect.addEventListener('change', () => {
+            dnsDetailsDiv.style.display = dnsOptionsSelect.value === 'yes' ? 'block' : 'none';
+        });
+
+        githubOptionsSelect.addEventListener('change', () => {
+            githubDetailsDiv.style.display = githubOptionsSelect.value === 'yes' ? 'block' : 'none';
+        });
+
+        YamlListForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            resultDiv.innerHTML = '正在处理...';
+
+            const formData = new FormData(YamlListForm);
+
+            // Add resolve_domains and max_depth to the form data
+            formData.append('resolve_domains', document.getElementById('resolve-domains').value);
+            const maxDepthValue = parseInt(document.getElementById('max-depth').value);
+            formData.append('max_depth', maxDepthValue); 
+
+            const url = `/listget?${new URLSearchParams(formData).toString()}`;
+
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    if (response.headers.get('Content-Disposition')) {
+                        const blob = await response.blob();
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = formData.get('filename') || 'yaml.list';
+                        link.click();
+                        resultDiv.innerHTML = '文件已成功生成并下载。';
+                    } else {
+                        const data = await response.json();
+                        resultDiv.innerHTML = `操作成功: ${JSON.stringify(data, null, 2)}`;
+                    }
+                } else {
+                    const errorData = await response.json();
+                    resultDiv.innerHTML = `错误: ${errorData.error}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `错误: ${error.message}`;
+            }
+        });
+
+        // YAML Process Form Logic
+        const yamlProcessForm = document.getElementById('yamlProcessForm');
+
+        yamlProcessForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            resultDiv.innerHTML = '正在处理...';
+
+            const formData = new FormData(yamlProcessForm);
+            const url = `/yamlprocess?${new URLSearchParams(formData).toString()}`;
+
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = formData.get('filename') || 'processed.yaml';
+                    link.click();
+                    resultDiv.innerHTML = 'YAML 文件已成功处理并下载。';
+                } else {
+                    const errorData = await response.json();
+                    resultDiv.innerHTML = `错误: ${errorData.error}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `错误: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+
+</html>
