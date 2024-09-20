@@ -61,7 +61,6 @@ def extract_servers(source_url, max_depth=8):
                             servers.add(item)
 
     extract_from_dict(data)
-    print(list(servers))
     return list(servers)
 
 
