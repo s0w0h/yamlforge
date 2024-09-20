@@ -110,7 +110,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
             if ip_address not in unique_servers:
                 unique_servers.add(ip_address)
                 if not is_private_ip(ip_address):
-                    ip_lines.append(f"IPCIDR,{ip_address}/32,no-resolve")
+                    ip_lines.append(f"{ip_address}")
 
         # 尝试解析 AAAA 记录 (IPv6)
         answers_v6 = resolver.resolve(domain, "AAAA")
@@ -119,7 +119,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
             if ip_address not in unique_servers:
                 unique_servers.add(ip_address)
                 if not is_private_ip(ip_address):
-                    ip_lines.append(f"IPCIDR6,{ip_address}/128,no-resolve")
+                    ip_lines.append(f"{ip_address}")
 
         # 递归解析 CNAME 记录
         try:
@@ -128,7 +128,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                 cname = cname_rdata.to_text().strip(".")
                 if cname not in unique_servers:
                     unique_servers.add(cname)
-                    domain_lines.append(f"DOMAIN,{cname}")
+                    domain_lines.append(f"{cname}")
                     for line in resolve_domain_recursive(
                         cname, unique_servers, dns_servers, max_depth, depth + 1
                     ):
@@ -161,12 +161,12 @@ def generate_server_list(servers, dns_servers, max_depth=8):
                 unique_servers.add(server)
                 if ":" in server:
                     if not is_private_ip(server):
-                        ip_lines.append(f"IPCIDR6,{server}/128,no-resolve\n")
+                        ip_lines.append(f"{server}\n")
                 elif "." in server and server.replace(".", "").isdigit():
                     if not is_private_ip(server):
-                        ip_lines.append(f"IPCIDR,{server}/32,no-resolve\n")
+                        ip_lines.append(f"{server}\n")
                 else:
-                    domain_lines.append(f"DOMAIN,{server}\n")
+                    domain_lines.append(f"{server}\n")
                     for line in resolve_domain_recursive(
                         server, unique_servers, dns_servers, max_depth
                     ):
