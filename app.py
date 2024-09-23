@@ -16,6 +16,7 @@ app = Flask(__name__, static_folder="assets", static_url_path="/assets")
 
 env = os.environ.copy()
 env["NODE_PATH"] = subprocess.check_output(["npm", "root", "-g"]).decode().strip()
+API_KEYS = os.environ.get("API_KEY", "").split(",")
 
 
 def extract_servers(source_url, max_depth=8):
@@ -271,6 +272,7 @@ def index():
 
 @app.route("/listget", methods=["GET"])
 def listget():
+    provided_api_key = request.args.get("api_key", "")
     source = request.args.get("source")
     field = request.args.get("field", "general.name")
     repo = request.args.get("repo")
@@ -281,6 +283,10 @@ def listget():
     dns_servers_str = request.args.get("dns_servers")
     max_depth_str = request.args.get("max_depth", 8)
     resolve_domains = request.args.get("resolve_domains", "false").lower() == "true"
+
+    if API_KEYS:
+        if provided_api_key not in API_KEYS:
+            return jsonify({"error": "Invalid API key"}), 403
 
     try:
         max_depth = int(max_depth_str)
@@ -343,9 +349,14 @@ def listget():
 
 @app.route("/yamlprocess", methods=["GET"])
 def yamlprocess():
+    provided_api_key = request.args.get("api_key", "")
     source_url = request.args.get("source")
     merge_url = request.args.get("merge")
     filename = request.args.get("filename")
+
+    if API_KEYS:
+        if provided_api_key not in API_KEYS:
+            return jsonify({"error": "Invalid API key"}), 403
 
     if not source_url or not merge_url:
         return jsonify({"error": "Missing source or merge URL"}), 400

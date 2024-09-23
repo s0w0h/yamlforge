@@ -250,6 +250,9 @@
 
         <div id="serverlist" class="tab-content active">
             <form id="YamlListForm">
+                <label for="api_key">API Key:</label>
+                <input type="password" id="api_key" name="api_key">
+
                 <label for="source">YAML 源地址:</label>
                 <input type="text" id="source" name="source"
                     placeholder="例如：https://raw.githubusercontent.com/xxx/xxx/main/xxx.yaml" required>
@@ -311,6 +314,9 @@
 
         <div id="yamlprocess" class="tab-content">
             <form id="yamlProcessForm">
+                <label for="yaml_api_key">API Key:</label>
+                <input type="password" id="yaml_api_key" name="api_key">
+
                 <label for="yaml-source">YAML 源地址:</label>
                 <input type="text" id="yaml-source" name="source"
                     placeholder="例如：https://raw.githubusercontent.com/xxx/xxx/main/xxx.yaml" required>
@@ -402,7 +408,7 @@
             // Add resolve_domains and max_depth to the form data
             formData.append('resolve_domains', document.getElementById('resolve-domains').value);
             const maxDepthValue = parseInt(document.getElementById('max-depth').value);
-            formData.append('max_depth', maxDepthValue); 
+            formData.append('max_depth', maxDepthValue);
 
             const url = `/listget?${new URLSearchParams(formData).toString()}`;
 
