@@ -30,7 +30,7 @@
 #### Docker (Recommended)
 
 ```bash
-docker run -d --restart always --name yamlforge -p 19527:19527 -e API_KEY=your_api_key s0w0h/yamlforge:latest
+docker run -d --restart unless-stopped --name yamlforge -p 19527:19527 -e API_KEY=your_api_key s0w0h/yamlforge:latest
 ```
 
 `-e API_KEY=your_api_key` is used to set the API key. Multiple API keys can be separated by commas, for example: `-e API_KEY=key1,key2,key3`.
@@ -50,7 +50,7 @@ docker run -d --restart always --name yamlforge -p 19527:19527 -e API_KEY=your_a
    ```
 4. Run the container:
    ```bash
-   docker run -d --restart always --name yamlforge -p 19527:19527 -e API_KEY=your_api_key yamlforge
+   docker run -d --restart unless-stopped --name yamlforge -p 19527:19527 -e API_KEY=your_api_key yamlforge
    ```
 
 #### Run Directly (Python 3.9)
