@@ -23,14 +23,14 @@
 - **GitHub 集成:** 可将生成的 `.list` 文件自动上传到 GitHub 仓库。
 - **简易网页访问:** 提供一个简单的网页界面，方便用户进行配置和操作。
 
-## 使用指南
+## 使用指南--restart unless-stopped
 
 ### 1. 部署
 
 #### Docker (推荐)
 
 ```bash
-docker run -d --restart always --name yamlforge -p 19527:19527 e API_KEY=your_api_key s0w0h/yamlforge:latest
+docker run -d --restart unless-stopped --name yamlforge -p 19527:19527 e API_KEY=your_api_key s0w0h/yamlforge:latest
 ```
 
 `-e API_KEY=your_api_key`用于设置 API 密钥，可以使用逗号分隔多个 API 密钥，例如 -e API_KEY=key1,key2,key3。
@@ -50,7 +50,7 @@ docker run -d --restart always --name yamlforge -p 19527:19527 e API_KEY=your_ap
    ```
 4. 运行容器:
    ```bash
-   docker run -d --restart always --name yamlforge -p 19527:19527 -e API_KEY=your_api_key yamlforge
+   docker run -d --restart unless-stopped --name yamlforge -p 19527:19527 -e API_KEY=your_api_key yamlforge
    ```
 
 #### 直接运行 (Python 3.9)
