@@ -83,18 +83,18 @@ After the application is running, you can use the following API interfaces for o
 
 #### `/listget` Parameter Description
 
-| Parameter         | Description                                                                                                                     | Required | Default Value       |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------- |
-| `api_key`         | API Key                                                                                                                         | Yes      |                     |
-| `source`          | URL of the YAML file                                                                                                            | Yes      |                     |
-| `field`           | Field to extract (effective when `resolve_domains` is `false`)                                                                  | No       | `general.name`      |
-| `repo`            | GitHub repository name (format: `username/repo`)                                                                                | No       |                     |
-| `token`           | GitHub Personal Access Token                                                                                                    | No       |                     |
-| `branch`          | GitHub branch name                                                                                                              | No       | `main`              |
-| `path`            | File path in the GitHub repository                                                                                              | No       | Root directory      |
-| `filename`        | Generated file name                                                                                                             | No       | `yaml.list`         |
-| `dns_servers`     | Comma-separated list of DNS servers (effective when `resolve_domains` is `true`)                                                | No       | `223.5.5.5,8.8.8.8` |
-| `max_depth`       | Maximum depth for field or domain resolution                                                                                    | No       | `8`                 |
+| Parameter           | Description                                                                                                                       | Required | Default Value         |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------- | -------- | --------------------- |
+| `api_key`         | API Key                                                                                                                           | Yes      |                       |
+| `source`          | URL of the YAML file, **Note, to prevent unexpected issues, it is recommended to perform URL encoding**                    | Yes      |                       |
+| `field`           | Field to extract (effective when `resolve_domains` is `false`)                                                                | No       | `general.name`      |
+| `repo`            | GitHub repository name (format:`username/repo`)                                                                                 | No       |                       |
+| `token`           | GitHub Personal Access Token                                                                                                      | No       |                       |
+| `branch`          | GitHub branch name                                                                                                                | No       | `main`              |
+| `path`            | File path in the GitHub repository                                                                                                | No       | Root directory        |
+| `filename`        | Generated file name                                                                                                               | No       | `yaml.list`         |
+| `dns_servers`     | Comma-separated list of DNS servers (effective when `resolve_domains` is `true`)                                              | No       | `223.5.5.5,8.8.8.8` |
+| `max_depth`       | Maximum depth for field or domain resolution                                                                                      | No       | `8`                 |
 | `resolve_domains` | Whether to resolve domains (if `true`, server addresses in the YAML configuration will be automatically extracted and resolved) | No       | `false`             |
 
 **Example:**
@@ -105,18 +105,18 @@ http://IP:PORT/listget?api_key=your_api_key&source=YOUR_YAML_URL&field=YOUR_YAML
 
 #### `/yamlprocess` Parameter Description
 
-| Parameter  | Description                                             | Required | Default Value    |
-| ---------- | ------------------------------------------------------- | -------- | ---------------- |
-| `api_key`  | API Key                                                 | Yes      |                  |
-| `source`   | URL of the base YAML configuration file                 | Yes      |                  |
-| `merge`    | URL of the JavaScript script for merging configurations | Yes      |                  |
-| `filename` | Generated file name                                     | No       | Same as `source` |
+| Parameter    | Description                                                                                                                                       | Required | Default Value      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------ |
+| `api_key`  | API Key                                                                                                                                           | Yes      |                    |
+| `source`   | URL of the base YAML configuration file,**Note, to prevent unexpected issues, it is recommended to perform URL encoding**                   | Yes      |                    |
+| `merge`    | URL of the JavaScript script for merging configurations, **Note, to prevent unexpected issues, it is recommended to perform URL encoding** | Yes      |                    |
+| `filename` | Generated file name                                                                                                                               | No       | Same as `source` |
 
 **Example:**
 
- ```
+```
 http://IP:PORT/yamlprocess?api_key=your_api_key&source=YOUR_BASE_YAML_URL&merge=YOUR_MERGE_JS_URL&filename=YOUR_FILE_NAME
- ```
+```
 
 #### JavaScript Script Instructions
 

@@ -41,7 +41,7 @@ docker run -d --restart unless-stopped --name yamlforge -p 19527:19527 e API_KEY
    ```bash
    git clone https://github.com/s0w0h/yamlforge.git
    ```
-2. 修改`Dockerfile`
+2. 修改 `Dockerfile`
    设置API_KEY
 3. 构建镜像:
    ```bash
@@ -83,19 +83,19 @@ docker run -d --restart unless-stopped --name yamlforge -p 19527:19527 e API_KEY
 
 #### `/listget` 参数说明
 
-| 参数              | 说明                                                                     | 是否必需 | 默认值              |
-| ----------------- | ------------------------------------------------------------------------ | -------- | ------------------- |
-| `api_key`         | API 密钥                                                                 | 是       |                     |
-| `source`          | YAML 文件的 URL                                                          | 是       |                     |
-| `field`           | 需要提取的字段 (当 `resolve_domains` 为 `false` 时生效)                  | 否       | `general.name`      |
-| `repo`            | GitHub 仓库名称 (格式: `username/repo`)                                  | 否       |                     |
-| `token`           | GitHub 个人访问令牌                                                      | 否       |                     |
-| `branch`          | GitHub 分支名称                                                          | 否       | `main`              |
-| `path`            | GitHub 仓库中的文件路径                                                  | 否       | 根目录              |
-| `filename`        | 生成的文件名                                                             | 否       | `yaml.list`         |
-| `dns_servers`     | 用逗号分隔的 DNS 服务器列表 (当 `resolve_domains` 为 `true` 时生效)      | 否       | `223.5.5.5,8.8.8.8` |
-| `max_depth`       | 字段或域名解析解析的最大深度                                             | 否       | `8`                 |
-| `resolve_domains` | 是否解析域名 (如果为 `true`，则会自动提取yaml配置中服务器地址并解析域名) | 否       | `false`             |
+| 参数                | 说明                                                                             | 是否必需 | 默认值                |
+| ------------------- | -------------------------------------------------------------------------------- | -------- | --------------------- |
+| `api_key`         | API 密钥                                                                         | 是       |                       |
+| `source`          | YAML 文件的 URL，**注意，为了防止出现意想不到的问题，建议进行URL encode** | 是       |                       |
+| `field`           | 需要提取的字段 (当 `resolve_domains` 为 `false` 时生效)                      | 否       | `general.name`      |
+| `repo`            | GitHub 仓库名称 (格式:`username/repo`)                                         | 否       |                       |
+| `token`           | GitHub 个人访问令牌                                                              | 否       |                       |
+| `branch`          | GitHub 分支名称                                                                  | 否       | `main`              |
+| `path`            | GitHub 仓库中的文件路径                                                          | 否       | 根目录                |
+| `filename`        | 生成的文件名                                                                     | 否       | `yaml.list`         |
+| `dns_servers`     | 用逗号分隔的 DNS 服务器列表 (当 `resolve_domains` 为 `true` 时生效)          | 否       | `223.5.5.5,8.8.8.8` |
+| `max_depth`       | 字段或域名解析解析的最大深度                                                     | 否       | `8`                 |
+| `resolve_domains` | 是否解析域名 (如果为 `true`，则会自动提取yaml配置中服务器地址并解析域名)       | 否       | `false`             |
 
 **示例:**
 
@@ -105,18 +105,18 @@ http://IP:PORT/listget?api_key=your_api_key&source=YOUR_YAML_URL&field=YOUR_YAML
 
 #### `/yamlprocess` 参数说明
 
-| 参数       | 说明                                 | 是否必需 | 默认值           |
-| ---------- | ------------------------------------ | -------- | ---------------- |
-| `api_key`  | API 密钥                             | 是       |                  |
-| `source`   | 基础 YAML 配置文件的 URL             | 是       |                  |
-| `merge`    | 用于合并配置的 JavaScript 脚本的 URL | 是       |                  |
-| `filename` | 生成的文件名                         | 否       | 与 `source` 相同 |
+| 参数         | 说明                                                                                                  | 是否必需 | 默认值             |
+| ------------ | ----------------------------------------------------------------------------------------------------- | -------- | ------------------ |
+| `api_key`  | API 密钥                                                                                              | 是       |                    |
+| `source`   | 基础 YAML 配置文件的 URL，**注意，为了防止出现意想不到的问题，建议进行URL encode**             | 是       |                    |
+| `merge`    | 用于合并配置的 JavaScript 脚本的 URL，**注意，为了防止出现意想不到的问题，建议进行URL encode** | 是       |                    |
+| `filename` | 生成的文件名                                                                                          | 否       | 与 `source` 相同 |
 
 **示例:**
 
- ```
+```
 http://IP:PORT/yamlprocess?api_key=your_api_key&source=YOUR_BASE_YAML_URL&merge=YOUR_MERGE_JS_URL&filename=YOUR_FILE_NAME
- ```
+```
 
 #### JavaScript 脚本说明
 
