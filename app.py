@@ -99,8 +99,8 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
     resolver = dns.resolver.Resolver()
     resolver.nameservers = dns_servers
     # 设置更短的超时时间
-    resolver.lifetime = 3.0  # 总解析超时时间
-    resolver.timeout = 2.0   # 每个服务器的超时时间
+    resolver.lifetime = 2.0  # 总解析超时时间
+    resolver.timeout = 1.0   # 每个服务器的超时时间
 
     domain_lines = []
     ip_lines = []
