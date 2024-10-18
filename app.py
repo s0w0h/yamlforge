@@ -99,7 +99,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
     resolver = dns.resolver.Resolver()
     resolver.nameservers = dns_servers
     # 设置更短的超时时间
-    resolver.lifetime = 2.0  # 总解析超时时间
+    resolver.lifetime = 4.0  # 总解析超时时间
     resolver.timeout = 1.0  # 每个服务器的超时时间
 
     domain_lines = []
@@ -108,8 +108,6 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
     if domain not in unique_servers:
         unique_servers.add(domain)
         domain_lines.append(f"{domain}")
-
-    print(f"Currently using {dns_servers} to parse {domain}")
 
     try:
         # 尝试解析 A 记录 (IPv4)
@@ -127,8 +125,8 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
             dns.resolver.NoNameservers,
             dns.exception.Timeout,
             dns.resolver.LifetimeTimeout,
-        ):
-            print(f"Error using {dns_servers} to parse {domain}")
+        ) as e:
+            print(f"Error resolving {domain}: {e}")
             pass
 
         # 尝试解析 AAAA 记录 (IPv6)
@@ -146,8 +144,8 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
             dns.resolver.NoNameservers,
             dns.exception.Timeout,
             dns.resolver.LifetimeTimeout,
-        ):
-            print(f"Error using {dns_servers} to parse {domain}")
+        ) as e:
+            print(f"Error resolving {domain}: {e}")
             pass
 
         # 递归解析 CNAME 记录
@@ -172,12 +170,12 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
             dns.resolver.NoNameservers,
             dns.exception.Timeout,
             dns.resolver.LifetimeTimeout,
-        ):
-            print(f"Error using {dns_servers} to parse {domain}")
+        ) as e:
+            print(f"Error resolving {domain}: {e}")
             pass
 
     except Exception as e:
-        print(f"Error resolving {domain}: {e}")
+        pass
 
     # 返回所有收集到的结果
     for line in domain_lines:
