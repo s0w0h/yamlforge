@@ -109,6 +109,8 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
         unique_servers.add(domain)
         domain_lines.append(f"{domain}")
 
+    print(f"Currently using {dns_servers} to parse {domain}")
+
     try:
         # 尝试解析 A 记录 (IPv4)
         try:
