@@ -100,7 +100,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
     resolver.nameservers = dns_servers
     # 设置更短的超时时间
     resolver.lifetime = 2.0  # 总解析超时时间
-    resolver.timeout = 1.0   # 每个服务器的超时时间
+    resolver.timeout = 1.0  # 每个服务器的超时时间
 
     domain_lines = []
     ip_lines = []
@@ -121,8 +121,13 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                     unique_servers.add(ip_address)
                     if not is_private_ip(ip_address):
                         ip_lines.append(f"{ip_address}")
-        except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers, 
-                dns.exception.Timeout, dns.resolver.LifetimeTimeout):
+        except (
+            dns.resolver.NoAnswer,
+            dns.resolver.NXDOMAIN,
+            dns.resolver.NoNameservers,
+            dns.exception.Timeout,
+            dns.resolver.LifetimeTimeout,
+        ):
             print(f"Error using {dns_servers} to parse {domain}")
             pass
 
@@ -135,8 +140,13 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                     unique_servers.add(ip_address)
                     if not is_private_ip(ip_address):
                         ip_lines.append(f"{ip_address}")
-        except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers,
-                dns.exception.Timeout, dns.resolver.LifetimeTimeout):
+        except (
+            dns.resolver.NoAnswer,
+            dns.resolver.NXDOMAIN,
+            dns.resolver.NoNameservers,
+            dns.exception.Timeout,
+            dns.resolver.LifetimeTimeout,
+        ):
             print(f"Error using {dns_servers} to parse {domain}")
             pass
 
@@ -156,8 +166,13 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                             domain_lines.append(line)
                         else:
                             ip_lines.append(line)
-        except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers,
-                dns.exception.Timeout, dns.resolver.LifetimeTimeout):
+        except (
+            dns.resolver.NoAnswer,
+            dns.resolver.NXDOMAIN,
+            dns.resolver.NoNameservers,
+            dns.exception.Timeout,
+            dns.resolver.LifetimeTimeout,
+        ):
             print(f"Error using {dns_servers} to parse {domain}")
             pass
 
