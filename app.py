@@ -102,24 +102,42 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
     domain_lines = []
     ip_lines = []
 
+    if domain not in unique_servers:
+        unique_servers.add(domain)
+        domain_lines.append(f"{domain}")
+
     try:
         # 尝试解析 A 记录 (IPv4)
-        answers = resolver.resolve(domain, "A")
-        for rdata in answers:
-            ip_address = rdata.to_text()
-            if ip_address not in unique_servers:
-                unique_servers.add(ip_address)
-                if not is_private_ip(ip_address):
-                    ip_lines.append(f"{ip_address}")
+        try:
+            answers = resolver.resolve(domain, "A")
+            for rdata in answers:
+                ip_address = rdata.to_text()
+                if ip_address not in unique_servers:
+                    unique_servers.add(ip_address)
+                    if not is_private_ip(ip_address):
+                        ip_lines.append(f"{ip_address}")
+        except (
+            dns.resolver.NoAnswer,
+            dns.resolver.NXDOMAIN,
+            dns.resolver.NoNameservers,
+        ):
+            pass
 
         # 尝试解析 AAAA 记录 (IPv6)
-        answers_v6 = resolver.resolve(domain, "AAAA")
-        for rdata in answers_v6:
-            ip_address = rdata.to_text()
-            if ip_address not in unique_servers:
-                unique_servers.add(ip_address)
-                if not is_private_ip(ip_address):
-                    ip_lines.append(f"{ip_address}")
+        try:
+            answers_v6 = resolver.resolve(domain, "AAAA")
+            for rdata in answers_v6:
+                ip_address = rdata.to_text()
+                if ip_address not in unique_servers:
+                    unique_servers.add(ip_address)
+                    if not is_private_ip(ip_address):
+                        ip_lines.append(f"{ip_address}")
+        except (
+            dns.resolver.NoAnswer,
+            dns.resolver.NXDOMAIN,
+            dns.resolver.NoNameservers,
+        ):
+            pass
 
         # 递归解析 CNAME 记录
         try:
@@ -129,6 +147,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                 if cname not in unique_servers:
                     unique_servers.add(cname)
                     domain_lines.append(f"{cname}")
+                    # 递归解析 CNAME 指向的域名
                     for line in resolve_domain_recursive(
                         cname, unique_servers, dns_servers, max_depth, depth + 1
                     ):
@@ -136,13 +155,16 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                             domain_lines.append(line)
                         else:
                             ip_lines.append(line)
-        except dns.resolver.NoAnswer:
+        except (
+            dns.resolver.NoAnswer,
+            dns.resolver.NXDOMAIN,
+            dns.resolver.NoNameservers,
+        ):
             pass
 
-    except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
-        pass
     except Exception as e:
         print(f"Error resolving {domain}: {e}")
+        # 错误发生时继续处理其他域名
 
     for line in domain_lines:
         yield line
