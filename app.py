@@ -98,6 +98,9 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
 
     resolver = dns.resolver.Resolver()
     resolver.nameservers = dns_servers
+    # 设置更短的超时时间
+    resolver.lifetime = 3.0  # 总解析超时时间
+    resolver.timeout = 2.0   # 每个服务器的超时时间
 
     domain_lines = []
     ip_lines = []
@@ -116,11 +119,8 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                     unique_servers.add(ip_address)
                     if not is_private_ip(ip_address):
                         ip_lines.append(f"{ip_address}")
-        except (
-            dns.resolver.NoAnswer,
-            dns.resolver.NXDOMAIN,
-            dns.resolver.NoNameservers,
-        ):
+        except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers, 
+                dns.exception.Timeout, dns.resolver.LifetimeTimeout):
             pass
 
         # 尝试解析 AAAA 记录 (IPv6)
@@ -132,11 +132,8 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                     unique_servers.add(ip_address)
                     if not is_private_ip(ip_address):
                         ip_lines.append(f"{ip_address}")
-        except (
-            dns.resolver.NoAnswer,
-            dns.resolver.NXDOMAIN,
-            dns.resolver.NoNameservers,
-        ):
+        except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers,
+                dns.exception.Timeout, dns.resolver.LifetimeTimeout):
             pass
 
         # 递归解析 CNAME 记录
@@ -155,17 +152,14 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                             domain_lines.append(line)
                         else:
                             ip_lines.append(line)
-        except (
-            dns.resolver.NoAnswer,
-            dns.resolver.NXDOMAIN,
-            dns.resolver.NoNameservers,
-        ):
+        except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers,
+                dns.exception.Timeout, dns.resolver.LifetimeTimeout):
             pass
 
     except Exception as e:
         print(f"Error resolving {domain}: {e}")
-        # 错误发生时继续处理其他域名
 
+    # 返回所有收集到的结果
     for line in domain_lines:
         yield line
     for line in ip_lines:
@@ -418,4 +412,4 @@ def yamlprocess():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=19527)
+    app.run(host="0.0.0.0", port=19527, timeout=300)
