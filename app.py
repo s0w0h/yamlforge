@@ -123,6 +123,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                         ip_lines.append(f"{ip_address}")
         except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers, 
                 dns.exception.Timeout, dns.resolver.LifetimeTimeout):
+            print(f"Error using {dns_servers} to parse {domain}")
             pass
 
         # 尝试解析 AAAA 记录 (IPv6)
@@ -136,6 +137,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                         ip_lines.append(f"{ip_address}")
         except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers,
                 dns.exception.Timeout, dns.resolver.LifetimeTimeout):
+            print(f"Error using {dns_servers} to parse {domain}")
             pass
 
         # 递归解析 CNAME 记录
@@ -156,6 +158,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
                             ip_lines.append(line)
         except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers,
                 dns.exception.Timeout, dns.resolver.LifetimeTimeout):
+            print(f"Error using {dns_servers} to parse {domain}")
             pass
 
     except Exception as e:
