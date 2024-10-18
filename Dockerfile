@@ -22,4 +22,4 @@ EXPOSE 19527
 # 设置环境变量 API_KEY
 ENV API_KEY=""
 
-CMD ["gunicorn", "--bind", "0.0.0.0:19527", "--timeout", "600", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:19527", "--timeout", "1800", "app:app"]
