@@ -216,11 +216,9 @@ def generate_server_list(servers, dns_servers, max_depth=8):
 
 
 def upload_to_github(
-    filename, repo_name, token, branch="main", path="", rename="yaml.list", proxies={}
-):
-    session = requests.Session()
-    session.proxies = proxies
-    g = Github(token, session=session)
+    filename, repo_name, token, branch="main", path="", rename="yaml.list"):
+
+    g = Github(token)
     
     repo = g.get_repo(repo_name)
     file_path = posixpath.join(path, rename)
@@ -389,7 +387,7 @@ def listget():
     try:
         if repo and token:
             try:
-                upload_to_github(temp_filename, repo, token, branch, path, filename, proxies=proxies)
+                upload_to_github(temp_filename, repo, token, branch, path, filename)
                 return jsonify(
                     {
                         "message": f"File uploaded to GitHub successfully at {os.path.join(path, filename)}"
