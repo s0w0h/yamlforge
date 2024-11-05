@@ -216,9 +216,10 @@ def generate_server_list(servers, dns_servers, max_depth=8):
 
 
 def upload_to_github(
-    filename, repo_name, token, branch="main", path="", rename="yaml.list"
+    filename, repo_name, token, branch="main", path="", rename="yaml.list", proxies={}
 ):
     g = Github(token)
+    g.session.proxies = proxies
     repo = g.get_repo(repo_name)
     file_path = posixpath.join(path, rename)
 
@@ -308,6 +309,7 @@ def index():
 def listget():
     provided_api_key = request.args.get("api_key", "")
     source = request.args.get("source")
+    proxy = request.args.get("proxy", "")
     field = request.args.get("field", "general.name")
     repo = request.args.get("repo")
     token = request.args.get("token")
@@ -330,9 +332,30 @@ def listget():
     if not source:
         return jsonify({"error": "Missing source parameter"}), 400
 
-    response = requests.get(source)
-    response.raise_for_status()
-    data = yaml.safe_load(response.text)
+    try:
+        proxies = {}
+        if proxy:
+            if proxy.startswith("socks"):
+                proxies = {"http": proxy, "https": proxy}
+            elif proxy.startswith("http"):
+                proxies = {"http": proxy, "https": proxy}
+            else:
+                return jsonify({"error": "Invalid proxy format"}), 400
+
+        try:
+            response = requests.get(source, proxies=proxies, timeout=60)
+            response.raise_for_status()
+            data = yaml.safe_load(response.text)
+        except requests.exceptions.Timeout:
+            return jsonify({"error": "Request timed out"}), 408
+        except requests.exceptions.SSLError:
+            return jsonify({"error": "SSL verification failed"}), 495
+        except requests.exceptions.RequestException as e:
+            return jsonify({"error": f"Failed to fetch source: {str(e)}"}), 500
+        except yaml.YAMLError as e:
+            return jsonify({"error": f"Invalid YAML format: {str(e)}"}), 400
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
     if resolve_domains:
         servers = extract_servers(source, max_depth=max_depth)
@@ -364,7 +387,7 @@ def listget():
     try:
         if repo and token:
             try:
-                upload_to_github(temp_filename, repo, token, branch, path, filename)
+                upload_to_github(temp_filename, repo, token, branch, path, filename, proxies=proxies)
                 return jsonify(
                     {
                         "message": f"File uploaded to GitHub successfully at {os.path.join(path, filename)}"
@@ -385,6 +408,7 @@ def listget():
 def yamlprocess():
     provided_api_key = request.args.get("api_key", "")
     source_url = request.args.get("source")
+    proxy = request.args.get("proxy", "")
     merge_url = request.args.get("merge")
     filename = request.args.get("filename")
 
@@ -396,19 +420,32 @@ def yamlprocess():
         return jsonify({"error": "Missing source or merge URL"}), 400
 
     try:
+        proxies = {}
+        if proxy:
+            if proxy.startswith("socks"):
+                proxies = {"http": proxy, "https": proxy}
+            elif proxy.startswith("http"):
+                proxies = {"http": proxy, "https": proxy}
+            else:
+                return jsonify({"error": "Invalid proxy format"}), 400
+
         with tempfile.NamedTemporaryFile(
             "wb", delete=False, suffix=".yaml"
         ) as temp_yaml_file, tempfile.NamedTemporaryFile(
             "wb", delete=False, suffix=".js"
         ) as temp_js_file:
 
-            with requests.get(source_url, stream=True) as response:
+            with requests.get(
+                source_url, stream=True, proxies=proxies
+            ) as response:
                 response.raise_for_status()
                 for chunk in response.iter_content(chunk_size=8192):
                     temp_yaml_file.write(chunk)
             temp_yaml_file_path = temp_yaml_file.name
 
-            with requests.get(merge_url) as response:
+            with requests.get(
+                merge_url, proxies=proxies
+            ) as response:
                 response.raise_for_status()
                 temp_js_file.write(response.content)
             temp_js_file_path = temp_js_file.name

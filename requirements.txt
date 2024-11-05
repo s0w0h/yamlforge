@@ -1,6 +1,8 @@
 requests
+requests[socks]
 PyYAML
 Flask
 PyGithub
 gunicorn
 dnspython
+

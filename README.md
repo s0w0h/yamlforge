@@ -87,6 +87,7 @@ docker run -d --restart unless-stopped --name yamlforge -p 19527:19527 e API_KEY
 | ------------------- | -------------------------------------------------------------------------------- | -------- | --------------------- |
 | `api_key`         | API 密钥                                                                         | 是       |                       |
 | `source`          | YAML 文件的 URL，**注意，为了防止出现意想不到的问题，建议进行URL encode** | 是       |                       |
+| `proxy`           | 下载YAML文件使用的代理配置，格式: http://user:pass@host:port 或 socks5://host:port| 否       |                       |
 | `field`           | 需要提取的字段 (当 `resolve_domains` 为 `false` 时生效)                      | 否       | `general.name`      |
 | `repo`            | GitHub 仓库名称 (格式:`username/repo`)                                         | 否       |                       |
 | `token`           | GitHub 个人访问令牌                                                              | 否       |                       |
@@ -111,6 +112,7 @@ http://IP:PORT/listget?api_key=your_api_key&source=YOUR_YAML_URL&field=YOUR_YAML
 | `source`   | 基础 YAML 配置文件的 URL，**注意，为了防止出现意想不到的问题，建议进行URL encode**             | 是       |                    |
 | `merge`    | 用于合并配置的 JavaScript 脚本的 URL，**注意，为了防止出现意想不到的问题，建议进行URL encode** | 是       |                    |
 | `filename` | 生成的文件名                                                                                          | 否       | 与 `source` 相同 |
+| `proxy`    | 下载文件使用的代理配置，格式: http://user:pass@host:port 或 socks5://host:port| 否       |                       |
 
 **示例:**
 
