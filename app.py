@@ -219,7 +219,9 @@ def upload_to_github(
     filename, repo_name, token, branch="main", path="", rename="yaml.list", proxies={}
 ):
     g = Github(token)
-    g.session.proxies = proxies
+    session = g.get_session()
+    session.proxies = proxies
+    
     repo = g.get_repo(repo_name)
     file_path = posixpath.join(path, rename)
 
