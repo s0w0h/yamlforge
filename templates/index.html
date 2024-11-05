@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 
@@ -308,6 +309,9 @@
                 <label for="filename">文件名 (默认: yaml.list):</label>
                 <input type="text" id="filename" name="filename" value="yaml.list">
 
+                <label for="proxy">代理 (可选):</label>
+                <input type="text" id="proxy" name="proxy" placeholder="例如：socks5://127.0.0.1:1080 或 http://127.0.0.1:8080">
+
                 <button type="submit">生成列表</button>
             </form>
         </div>
@@ -327,6 +331,9 @@
 
                 <label for="yaml-filename">输出文件名:</label>
                 <input type="text" id="yaml-filename" name="filename" placeholder="例如：processed.yaml">
+
+                <label for="yaml-proxy">代理 (可选):</label>
+                <input type="text" id="yaml-proxy" name="proxy" placeholder="例如：socks5://127.0.0.1:1080 或 http://127.0.0.1:8080">
 
                 <button type="submit">处理 YAML</button>
             </form>
@@ -466,3 +473,4 @@
 </body>
 
 </html>
+```
