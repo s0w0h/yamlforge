@@ -323,7 +323,7 @@ def listget():
     provided_api_key = request.args.get("api_key", "")
     source = request.args.get("source")
     proxy = request.args.get("proxy", "")
-    field = request.args.get("field", "general.name")
+    field = request.args.get("field", "proxies.server")
     repo = request.args.get("repo")
     token = request.args.get("token")
     branch = request.args.get("branch", "main")
@@ -371,7 +371,7 @@ def listget():
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
     if resolve_domains:
-        servers = extract_servers(source, max_depth=max_depth)
+        servers = extract_servers(source, field, max_depth=max_depth)
     else:
         servers = extract_field(data, field, max_depth=max_depth)
         if not servers:
