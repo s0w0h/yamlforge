@@ -19,7 +19,7 @@ env["NODE_PATH"] = subprocess.check_output(["npm", "root", "-g"]).decode().strip
 API_KEYS = os.environ.get("API_KEY", "").split(",")
 
 
-def extract_servers(source_url, max_depth=8):
+def extract_servers(source_url, field=None, max_depth=8):
     response = requests.get(source_url)
     response.raise_for_status()
     data = yaml.safe_load(response.text)
@@ -42,7 +42,6 @@ def extract_servers(source_url, max_depth=8):
     def extract_from_dict(data, depth=0):
         if depth > max_depth:
             return
-
         for key, value in data.items():
             if isinstance(value, str):
                 if ipv4_pattern.match(value) or ipv6_pattern.match(value):
@@ -61,7 +60,21 @@ def extract_servers(source_url, max_depth=8):
                         elif domain_pattern.match(item):
                             servers.add(item)
 
-    extract_from_dict(data)
+    if field:
+        field_data = extract_field(data, field, max_depth=max_depth)
+        if isinstance(field_data, dict):
+            extract_from_dict(field_data)
+        elif isinstance(field_data, list):
+            for item in field_data:
+                if isinstance(item, dict):
+                    extract_from_dict(item)
+                elif isinstance(item, str):
+                    if ipv4_pattern.match(item) or ipv6_pattern.match(item):
+                        servers.add(item)
+                    elif domain_pattern.match(item):
+                        servers.add(item)
+    else:
+        extract_from_dict(data)
     return list(servers)
 
 
