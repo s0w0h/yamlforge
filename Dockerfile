@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM python:3.9-alpine
 
 WORKDIR /app
 
@@ -11,8 +11,6 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm
 
-
-RUN npm install js-yaml iconv-lite
 RUN npm install -g js-yaml iconv-lite
 
 COPY . /app
