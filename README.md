@@ -30,7 +30,7 @@
 #### Docker (推荐)
 
 ```bash
-docker run -d --restart unless-stopped --name yamlforge -p 19527:19527 e API_KEY=your_api_key s0w0h/yamlforge:latest
+docker run -d --restart unless-stopped --name yamlforge -p 19527:19527 -e API_KEY=your_api_key s0w0h/yamlforge:latest
 ```
 
 `-e API_KEY=your_api_key`用于设置 API 密钥，可以使用逗号分隔多个 API 密钥，例如 -e API_KEY=key1,key2,key3。
