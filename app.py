@@ -238,26 +238,36 @@ def upload_to_github(
 
     try:
         contents = repo.get_contents(file_path, ref=branch)
-        with open(filename, "r") as f:
-            file_content = f.read()
-        repo.update_file(
-            contents.path,
-            "Update proxies.server list",
-            file_content,
-            contents.sha,
-            branch=branch,
-        )
+        file_exists = True
     except Exception as e:
         if "Not Found" in str(e):
-            with open(filename, "r") as f:
-                file_content = f.read()
+            file_exists = False
+        else:
+            raise e
+
+    with open(filename, "r") as f:
+        file_content = f.read()
+
+    if file_exists:
+        try:
+            repo.update_file(
+                contents.path,
+                "Update proxies.server list",
+                file_content,
+                contents.sha,
+                branch=branch,
+            )
+        except Exception as e:
+            raise e
+    else:
+        try:
             repo.create_file(
                 file_path,
                 "Add proxies.server list",
                 file_content,
                 branch=branch,
             )
-        else:
+        except Exception as e:
             raise e
 
 
