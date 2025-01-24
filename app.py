@@ -139,7 +139,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
             dns.exception.Timeout,
             dns.resolver.LifetimeTimeout,
         ) as e:
-            print(f"Error resolving {domain}: {e}")
+            # print(f"Error resolving {domain}: {e}")
             pass
 
         # 尝试解析 AAAA 记录 (IPv6)
@@ -158,7 +158,7 @@ def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, d
             dns.exception.Timeout,
             dns.resolver.LifetimeTimeout,
         ) as e:
-            print(f"Error resolving {domain}: {e}")
+            # print(f"Error resolving {domain}: {e}")
             pass
 
         # 递归解析 CNAME 记录
