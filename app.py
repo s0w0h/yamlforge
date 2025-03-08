@@ -2,6 +2,7 @@ import subprocess
 import requests
 import yaml
 import os
+import concurrent.futures
 from flask import Flask, request, jsonify, send_file, render_template
 import tempfile
 from github import Github
@@ -10,6 +11,7 @@ import socket
 import ipaddress
 import shutil
 import dns.resolver
+import dns.exception
 import re
 
 app = Flask(__name__, static_folder="assets", static_url_path="/assets")
@@ -100,7 +102,7 @@ PRIVATE_NETWORKS = [
     ipaddress.ip_network('10.0.0.0/8'),
     ipaddress.ip_network('172.16.0.0/12'),
     ipaddress.ip_network('192.168.0.0/16'),
-    ipaddress.ip_network('fc00::/7')  # IPv6 Unique Local Addresses
+    ipaddress.ip_network('fc00::/7')
 ]
 
 def is_private_ip(ip_address):
@@ -110,126 +112,97 @@ def is_private_ip(ip_address):
     except ipaddress.AddressValueError:
         return False
 
+def resolve_domain_recursive(domain, dns_servers, max_depth=8):
+    unique_servers = set()
+    results = []
 
-def resolve_domain_recursive(domain, unique_servers, dns_servers, max_depth=8, depth=0):
-    if depth >= max_depth:
-        return
+    def resolve_single(domain, record_type, dns_servers, depth):
+        if depth >= max_depth:
+            return []
 
-    resolver = dns.resolver.Resolver()
-    resolver.nameservers = dns_servers
-    resolver.lifetime = 6
-    resolver.timeout = 2
+        resolver = dns.resolver.Resolver()
+        resolver.nameservers = dns_servers
+        resolver.lifetime = 6
+        resolver.timeout = 2
 
-    domain_lines = []
-    ip_lines = []
+        resolved_items = []
 
-    if domain not in unique_servers:
-        unique_servers.add(domain)
-        domain_lines.append(f"{domain}")
+        if domain not in unique_servers:
+            unique_servers.add(domain)
+            resolved_items.append(f"DOMAIN:{domain}")
 
-    try:
-        # 尝试解析 A 记录 (IPv4)
         try:
-            answers = resolver.resolve(domain, "A")
+            answers = resolver.resolve(domain, record_type)
             for rdata in answers:
-                ip_address = rdata.to_text()
-                if ip_address not in unique_servers:
-                    unique_servers.add(ip_address)
-                    if not is_private_ip(ip_address):
-                        ip_lines.append(f"{ip_address}")
-        except (
-            dns.resolver.NoAnswer,
-            dns.resolver.NXDOMAIN,
-            dns.resolver.NoNameservers,
-            dns.exception.Timeout,
-            dns.resolver.LifetimeTimeout,
-        ) as e:
-            # print(f"Error resolving {domain}: {e}")
+                ip_or_cname = rdata.to_text().strip(".")
+                if ip_or_cname not in unique_servers:
+                    unique_servers.add(ip_or_cname)
+                    if record_type == "CNAME":
+                         resolved_items.append(f"DOMAIN:{ip_or_cname}")
+                         resolved_items.extend(resolve_single(ip_or_cname, "A", dns_servers, depth + 1))
+                         resolved_items.extend(resolve_single(ip_or_cname, "AAAA", dns_servers, depth + 1))
+
+                    elif not is_private_ip(ip_or_cname):
+                        resolved_items.append(ip_or_cname)
+        except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers,
+                dns.exception.Timeout, dns.resolver.LifetimeTimeout):
             pass
+        except Exception as e:
+             print(f"Unexpected error resolving {domain} ({record_type}): {e}")
+             pass
 
-        # 尝试解析 AAAA 记录 (IPv6)
-        try:
-            answers_v6 = resolver.resolve(domain, "AAAA")
-            for rdata in answers_v6:
-                ip_address = rdata.to_text()
-                if ip_address not in unique_servers:
-                    unique_servers.add(ip_address)
-                    if not is_private_ip(ip_address):
-                        ip_lines.append(f"{ip_address}")
-        except (
-            dns.resolver.NoAnswer,
-            dns.resolver.NXDOMAIN,
-            dns.resolver.NoNameservers,
-            dns.exception.Timeout,
-            dns.resolver.LifetimeTimeout,
-        ) as e:
-            # print(f"Error resolving {domain}: {e}")
-            pass
+        return resolved_items
 
-        # 递归解析 CNAME 记录
-        try:
-            cname_answers = resolver.resolve(domain, "CNAME")
-            for cname_rdata in cname_answers:
-                cname = cname_rdata.to_text().strip(".")
-                if cname not in unique_servers:
-                    unique_servers.add(cname)
-                    domain_lines.append(f"{cname}")
-                    # 递归解析 CNAME 指向的域名
-                    for line in resolve_domain_recursive(
-                        cname, unique_servers, dns_servers, max_depth, depth + 1
-                    ):
-                        if "DOMAIN" in line:
-                            domain_lines.append(line)
-                        else:
-                            ip_lines.append(line)
-        except (
-            dns.resolver.NoAnswer,
-            dns.resolver.NXDOMAIN,
-            dns.resolver.NoNameservers,
-            dns.exception.Timeout,
-            dns.resolver.LifetimeTimeout,
-        ) as e:
-            print(f"Error resolving {domain}: {e}")
-            pass
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(resolve_single, domain, record_type, dns_servers, 0)
+                   for record_type in ["A", "AAAA", "CNAME"]]
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                results.extend(future.result())
+            except Exception as e:
+                print(f"Error in resolving future: {e}")
 
-    except Exception as e:
-        pass
-
-    # 返回所有收集到的结果
-    for line in domain_lines:
-        yield line
-    for line in ip_lines:
-        yield line
-
+    return results
 
 def generate_server_list(servers, dns_servers, max_depth=8):
     unique_servers = set()
-    domain_lines = []
-    ip_lines = []
+    all_results = []
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_server = {executor.submit(resolve_domain_recursive, server, dns_servers, max_depth): server
+                             for server in servers
+                             if ":" not in server and (not "." in server or not server.replace(".", "").isdigit())}
+
+        for future in concurrent.futures.as_completed(future_to_server):
+            server = future_to_server[future]
+            try:
+                results = future.result()
+                for item in results:
+                    if item not in unique_servers:
+                         unique_servers.add(item)
+                         all_results.append(item)
+
+            except Exception as e:
+                print(f"Error resolving {server}: {e}")
+
     with tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8") as f:
         filename = f.name
+        for result in all_results:
+             if result.startswith("DOMAIN:"):
+                 f.write(f"{result[7:]}\n")
+             else: # 如果是IP
+                 f.write(f"{result}\n")
+
         for server in servers:
             if server not in unique_servers:
-                unique_servers.add(server)
-                if ":" in server:
+                if ":" in server :
                     if not is_private_ip(server):
-                        ip_lines.append(f"{server}\n")
-                elif "." in server and server.replace(".", "").isdigit():
+                         f.write(f"{server}\n")
+                         unique_servers.add(server)
+                elif server.replace(".", "").isdigit():
                     if not is_private_ip(server):
-                        ip_lines.append(f"{server}\n")
-                else:
-                    domain_lines.append(f"{server}\n")
-                    for line in resolve_domain_recursive(
-                        server, unique_servers, dns_servers, max_depth
-                    ):
-                        if "DOMAIN" in line:
-                            domain_lines.append(f"{line}\n")
-                        else:
-                            ip_lines.append(f"{line}\n")
-
-        f.writelines(domain_lines)
-        f.writelines(ip_lines)
-
+                        f.write(f"{server}\n")
+                        unique_servers.add(server)
     return filename
 
 
@@ -296,7 +269,6 @@ def process_yaml_with_js(yaml_file_path, js_file_path):
         const yamlInput = fs.readFileSync('{yaml_file_path}');
         let yamlStr = iconv.decode(yamlInput, 'utf-8');
         
-        // Handle BOM if present
         if (yamlStr.charCodeAt(0) === 0xFEFF) {{
             yamlStr = yamlStr.slice(1);
         }}
