@@ -96,12 +96,18 @@ def extract_field(data, field, max_depth=8, current_depth=0):
             return None
     return data
 
+PRIVATE_NETWORKS = [
+    ipaddress.ip_network('10.0.0.0/8'),
+    ipaddress.ip_network('172.16.0.0/12'),
+    ipaddress.ip_network('192.168.0.0/16'),
+    ipaddress.ip_network('fc00::/7')  # IPv6 Unique Local Addresses
+]
 
 def is_private_ip(ip_address):
     try:
         addr = ipaddress.ip_address(ip_address)
-        return addr.is_private
-    except ValueError:
+        return any(addr in network for network in PRIVATE_NETWORKS)
+    except ipaddress.AddressValueError:
         return False
 
 
