@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/s0w0h/yamlforge/blob/main/LICENSE"><img src="assets/GPL-3.0License.svg" alt="License"></a>
-  <a href="https://github.com/s0w0h/yamlforge/pulls"><img src="assets/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+  <a href="https://github.com/s0w0h/yamlforge/blob/main/LICENSE"><img src="../assets/GPL-3.0License.svg" alt="License"></a>
+  <a href="https://github.com/s0w0h/yamlforge/pulls"><img src="../assets/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
 
 **YamlForge** 是一个轻量级的工具，用于从 YAML 配置文件中提取信息并使用 JavaScript 脚本进行处理。
