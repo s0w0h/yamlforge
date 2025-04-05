@@ -7,12 +7,43 @@
     <title>YamlForge</title>
     <link rel="icon" href="assets/logo.png" type="image/png" />
     <style>
+        :root {
+            --bg-color: #f4f4f4;
+            --card-bg: #fff;
+            --text-color: #333;
+            --primary-color: #2196F3;
+            --primary-dark: #1976D2;
+            --secondary-color: #757575;
+            --border-color: #ddd;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --success-color: #4CAF50;
+            --success-dark: #388E3C;
+            --danger-color: #f44336;
+            --danger-dark: #d32f2f;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --primary-color: #1976D2;
+            --primary-dark: #0d47a1;
+            --secondary-color: #9e9e9e;
+            --border-color: #333;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --success-color: #388E3C;
+            --success-dark: #2e7d32;
+            --danger-color: #d32f2f;
+            --danger-dark: #b71c1c;
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             line-height: 1.6;
             margin: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .github-corner:hover .octo-arm {
@@ -51,14 +82,15 @@
             max-width: 960px;
             margin: 30px auto;
             padding: 20px;
-            background-color: #fff;
+            background-color: var(--card-bg);
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px var(--shadow-color);
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
 
         h1 {
             text-align: center;
-            color: #2196F3;
+            color: var(--primary-color);
             margin-bottom: 30px;
         }
 
@@ -222,6 +254,28 @@
             content: "⚖ ";
             margin-right: 2px;
         }
+
+        .theme-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            transition: background-color 0.3s;
+        }
+
+        .theme-switch:hover {
+            background-color: var(--primary-dark);
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
@@ -240,6 +294,15 @@
                 fill="currentColor" class="octo-body"></path>
         </svg>
     </a>
+    <div class="theme-switch" id="themeSwitch" title="切换主题">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path
+                d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42">
+            </path>
+        </svg>
+    </div>
     <div class="container">
         <h1>YamlForge</h1>
 
@@ -309,7 +372,8 @@
                 <input type="text" id="filename" name="filename" value="yaml.list">
 
                 <label for="proxy">代理 (可选):</label>
-                <input type="text" id="proxy" name="proxy" placeholder="例如：socks5://127.0.0.1:1080 或 http://127.0.0.1:8080">
+                <input type="text" id="proxy" name="proxy"
+                    placeholder="例如：socks5://127.0.0.1:1080 或 http://127.0.0.1:8080">
 
                 <button type="submit">生成列表</button>
             </form>
@@ -332,7 +396,8 @@
                 <input type="text" id="yaml-filename" name="filename" placeholder="例如：processed.yaml">
 
                 <label for="yaml-proxy">代理 (可选):</label>
-                <input type="text" id="yaml-proxy" name="proxy" placeholder="例如：socks5://127.0.0.1:1080 或 http://127.0.0.1:8080">
+                <input type="text" id="yaml-proxy" name="proxy"
+                    placeholder="例如：socks5://127.0.0.1:1080 或 http://127.0.0.1:8080">
 
                 <button type="submit">处理 YAML</button>
             </form>
@@ -468,6 +533,44 @@
                 resultDiv.innerHTML = `错误: ${error.message}`;
             }
         });
+
+        // 主题切换逻辑
+        const themeSwitch = document.getElementById('themeSwitch');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+        // 检查本地存储
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            updateThemeIcon(true);
+        } else if (currentTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            updateThemeIcon(false);
+        } else if (prefersDarkScheme.matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            updateThemeIcon(true);
+        }
+
+        themeSwitch.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                updateThemeIcon(false);
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                updateThemeIcon(true);
+            }
+        });
+
+        function updateThemeIcon(isDark) {
+            if (isDark) {
+                themeSwitch.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+            } else {
+                themeSwitch.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>';
+            }
+        }
     </script>
 </body>
 
